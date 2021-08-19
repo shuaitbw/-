@@ -72,7 +72,7 @@ const $ = new Env('云扫码')
 let ysm = $.getjson('ysm', [])
 let needNotice = $.getval('ysmNotice') == 'true'
 let ysmBanfirstTask = $.getval('ysmBanfirstTask') == 'true' // 禁止脚本执行首个任务，避免每日脚本跑首次任务导致微信限制
-let ysmBanhalfTask = $.getval('ysmBanhalfTask') == 'true' // 脚本执行完第50个任务时退出任务，再手动阅读2篇避免出现微信限制
+let ysmBanhalfTask = $.getval('ysmBanhalfTask') == 'true' // 脚本执行完第47个任务时退出任务，再手动阅读2篇避免出现微信限制
 let ysmtxAmt = ($.getval('ysmtxAmt') || '0') - 0  // 此处修改提现金额，0.3元等于3000币，默认不提现
 ysmtxAmt = ysmtxAmt > 3000 ? (parseInt(ysmtxAmt / 1000) * 1000) : ysmtxAmt > 0 ? 3000 : 0
 let concurrency = ($.getval('ysmConcurrency') || '1') - 0 // 并发执行任务的账号数，默单账号循环执行
@@ -122,9 +122,9 @@ const baseHeaders = {
 function execTask(ac, i) {
   return new Promise(async resolve => {
     try {
-      await $.wait(i * 50)
+      await $.wait(i * 47)
       await ysm4(ac)
-      if ((!execNo || (execNo.length == 0 || execNo.includes(ac.no))) && ac.remain_read && !(ac.day_read < 2 && ysmBanfirstTask) && !(ysmBanhalfTask && ac.day_read == 50)) {
+      if ((!execNo || (execNo.length == 0 || execNo.includes(ac.no))) && ac.remain_read && !(ac.day_read < 2 && ysmBanfirstTask) && !(ysmBanhalfTask && ac.day_read == 47)) {
         $.log(`😄账号${ac.no}今日已读${ac.day_read}次，今日待读${ac.remain_read}次，即将阅读`)
         await $.wait((i + 1) * 600)
         let flag = 0
@@ -343,7 +343,7 @@ function ysm3(ac, time) {
             if (ac.remain_read <= 0) {
               f = 0
               $.msg(`${$.name}: 账号${ac.no}`, '', `今日阅读已达上限，请明日继续`)
-            } else if (ysmBanhalfTask && ac.day_read == 50) {
+            } else if (ysmBanhalfTask && ac.day_read == 47) {
               f = 0
               $.msg(`${$.name}: 账号${ac.no}`, '', `今日已阅读50篇，请手动阅读2篇再跑脚本`)
             } else {
